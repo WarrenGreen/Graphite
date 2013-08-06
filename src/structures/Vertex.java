@@ -1,13 +1,14 @@
 package structures;
 
+import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.util.ArrayList;
 
 public class Vertex<E> {
 	
 	private E 					element;
-	private int					xCoord;
-	private int					yCoord;
+	private Point				coords;
 	private Position<Vertex<E>> vertexLoc;
 	private Map<Object, Object> attributes;
 	private ArrayList<Edge> 		incidentEdges;
@@ -16,8 +17,7 @@ public class Vertex<E> {
 		this.attributes =  new HashMap<Object, Object>(5);
 		this.element = element;
 		this.vertexLoc = vertexLoc;
-		this.xCoord = 10;
-		this.yCoord = 10;
+		this.coords = new Point(10,10);
 		this.incidentEdges = new ArrayList<Edge>();
 		for(int i=0; i<incidentEdges.size(); i++)
 			this.incidentEdges.add(incidentEdges.get(i));
@@ -27,8 +27,7 @@ public class Vertex<E> {
 		this.attributes =  new HashMap<Object, Object>(5);
 		this.element = element;
 		this.vertexLoc = vertexLoc;
-		this.xCoord = xCoord;
-		this.yCoord = yCoord;
+		this.coords = new Point(xCoord, yCoord);
 		this.incidentEdges = new ArrayList<Edge>();
 		for(int i=0; i<incidentEdges.size(); i++)
 			this.incidentEdges.add(incidentEdges.get(i));
@@ -113,8 +112,18 @@ public class Vertex<E> {
 		return this.incidentEdges;
 	}
 	
+	public Point getCoords(){
+		return this.coords;
+	}
+	
+	public void setCoords(int xCoord, int yCoord){
+		this.coords = new Point(xCoord, yCoord);
+	}
+	
 	public void draw(Graphics g){
-		g.drawOval(xCoord, yCoord, 25,25);
+		g.setColor(Color.BLACK);
+		g.fillOval(coords.x, coords.y, 25, 25);
+		g.drawOval(coords.x, coords.y, 25,25);
 	}
 
 }

@@ -3,6 +3,7 @@ package green;
 import structures.*;
 import java.awt.EventQueue;
 
+import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import java.awt.GridBagLayout;
 import javax.swing.JPanel;
@@ -24,7 +25,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-import org.eclipse.wb.swing.FocusTraversalOnArray;
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
 
@@ -101,7 +101,6 @@ public class Display {
 		gbc_btnColorGraph.gridy = 0;
 		gbc_btnColorGraph.insets = new Insets(5,0,0,5);
 		mainPanel.add(btnColorGraph, gbc_btnColorGraph);
-		frame.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{drawpad, btnColorGraph, frame.getContentPane(), mainPanel}));
 	}
 	
 	class canvas extends JPanel implements MouseListener{
@@ -118,7 +117,33 @@ public class Display {
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			graph.insertVertex("", e.getX()-13, e.getY()-13);
+			int X = e.getX()-13;
+			int Y = e.getY()-13;
+			
+			for(Object v: graph.vertices()){
+				Vertex vv = (Vertex) v;
+				int vvY = vv.getCoords().y;
+				int vvX = vv.getCoords().x;
+				int[] collisions = {0,0,0,0};
+				
+				if(X+13 > vvX-13)
+					collisions[0]=1;
+				if(Y+13 > vvY-13)
+					collisions[1]=1;
+				if(X-13 < vvX+13)
+					collisions[2]=1;
+				if(Y-13 < vvY+13)
+					collisions[3]=1;
+				
+				for(int i=0;i<3;i++)
+					collisions[3]+=collisions[i];
+				
+				if(collisions[3]>3)
+					return;
+			
+			}
+			
+			graph.insertVertex("", X, Y);
 			this.repaint();
 		}
 
