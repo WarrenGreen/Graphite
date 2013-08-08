@@ -3,7 +3,6 @@ package green;
 import structures.*;
 import java.awt.EventQueue;
 
-import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import java.awt.GridBagLayout;
 import javax.swing.JPanel;
@@ -11,26 +10,18 @@ import javax.swing.JPanel;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
-import java.awt.Panel;
 import javax.swing.JButton;
 import java.awt.Insets;
 import javax.swing.BoxLayout;
 import java.awt.Color;
-import java.awt.FlowLayout;
 import javax.swing.ButtonGroup;
-import javax.swing.event.MenuDragMouseListener;
-import javax.swing.event.MenuListener;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import java.awt.Component;
-import java.awt.event.MouseAdapter;
-import java.awt.geom.Ellipse2D;
 import org.eclipse.wb.swing.FocusTraversalOnArray;
 
 
@@ -38,8 +29,8 @@ public class Display {
 
 	private JFrame frame;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
-	private AdjListGraph graph;
-	private Vertex	selected = null;
+	private AdjListGraph<Integer, Integer> graph;
+	private Vertex<Integer>	selected = null;
 
 	/**
 	 * Launch the application.
@@ -61,7 +52,7 @@ public class Display {
 	 * Create the application.
 	 */
 	public Display() {
-		graph = new AdjListGraph();
+		graph = new AdjListGraph<Integer, Integer>();
 		initialize();
 	}
 
@@ -87,6 +78,7 @@ public class Display {
 		mainPanel.setLayout(gbl_mainPanel);
 		
 		JPanel drawpad = new canvas();
+		drawpad.setDoubleBuffered(true);
 		drawpad.setBackground(Color.LIGHT_GRAY);
 		GridBagConstraints gbc_drawpad = new GridBagConstraints();
 		gbc_drawpad.gridwidth = 22;
@@ -98,10 +90,10 @@ public class Display {
 		
 		JButton btnColorGraph = new JButton("Color Graph");
 		btnColorGraph.addActionListener(new ActionListener() {
-
 			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub
+			public void actionPerformed(ActionEvent e) {
+				Functions func = new Functions();
+				graph = func.colorGraph(graph);
 				
 			}
 		});
@@ -121,13 +113,15 @@ public class Display {
 		public void paintComponent(Graphics g){
 			super.paintComponent(g);
 			Graphics2D g2d = (Graphics2D) g;
-			for(Object v:graph.vertices()){
-				Vertex vv = (Vertex)v;
-				vv.draw(g2d);
-			}
+			
 			for(Object e:graph.edges()){
 				Edge ee = (Edge) e;
 				ee.draw(g2d);
+			}
+			
+			for(Object v:graph.vertices()){
+				Vertex<String> vv = (Vertex<String>)v;
+				vv.draw(g2d);
 			}
 		}
 
@@ -136,10 +130,11 @@ public class Display {
 			int X = e.getX()-13;
 			int Y = e.getY()-13;
 			
-			Vertex vv = conflict(e);
-			if(vv==null)
-				graph.insertVertex("", X, Y);
-			else if(vv.contains(e.getPoint()))
+			Vertex<Integer> vv = conflict(e);
+			if(vv==null){
+				if(e.getButton()==MouseEvent.BUTTON1)
+					graph.insertVertex(-1, X, Y);
+			}else if(vv.contains(e.getPoint()))
 				if(e.getButton()==MouseEvent.BUTTON3){
 					if(vv == selected)
 						selected = null;
@@ -151,12 +146,12 @@ public class Display {
 			this.repaint();
 		}
 		
-		public Vertex conflict(MouseEvent e){
+		public Vertex<Integer> conflict(MouseEvent e){
 			int X = e.getX()-13;
 			int Y = e.getY()-13;
 			
 			for(Object v: graph.vertices()){
-				Vertex vv = (Vertex) v;
+				Vertex<Integer> vv = (Vertex<Integer>) v;
 				int vvY = vv.getCoords().y;
 				int vvX = vv.getCoords().x;
 				int[] collisions = {0,0,0,0};
@@ -186,7 +181,7 @@ public class Display {
 			return null;
 		}
 		
-		public void vertexClicked(Vertex vv, boolean controlDown){
+		public void vertexClicked(Vertex<Integer> vv, boolean controlDown){
 			if(selected == null){
 				vv.setColor(Color.RED);
 				selected = vv;
@@ -195,7 +190,7 @@ public class Display {
 					selected.setColor(Color.BLACK);
 					selected = null;
 				}else if(controlDown){
-					graph.insertEdge(selected, vv, "");
+					graph.insertEdge(selected, vv, 0);
 					
 				}else{
 					selected.setColor(Color.BLACK);

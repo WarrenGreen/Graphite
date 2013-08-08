@@ -134,7 +134,10 @@ public class Vertex<E> {
 		oval = new Ellipse2D.Double(coords.getX(), coords.getY(), 25, 25);
 		g2d.setColor(fillColor);
 		g2d.fill(oval);
-		
+		g2d.setColor(Color.WHITE);
+		if(Integer.parseInt(element.toString()) != -1)
+			g2d.drawString(element.toString(), (int)coords.getX()+10, (int)coords.getY()+17);
+
 	}
 
 }
