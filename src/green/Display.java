@@ -9,6 +9,7 @@ import java.awt.GridBagLayout;
 import javax.swing.JPanel;
 
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.Panel;
 import javax.swing.JButton;
@@ -27,6 +28,7 @@ import java.awt.event.MouseListener;
 
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
+import java.awt.geom.Ellipse2D;
 
 
 public class Display {
@@ -34,6 +36,7 @@ public class Display {
 	private JFrame frame;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 	private AdjListGraph graph;
+	private Vertex	selected = null;
 
 	/**
 	 * Launch the application.
@@ -107,16 +110,31 @@ public class Display {
 		public canvas(){
 			this.addMouseListener(this);
 		}
-		public void paint(Graphics g){
-			super.paint(g);
+		public void paintComponent(Graphics g){
+			super.paintComponent(g);
+			Graphics2D g2d = (Graphics2D) g;
 			for(Object v:graph.vertices()){
 				Vertex vv = (Vertex)v;
-				vv.draw(g);
+				vv.draw(g2d);
+			}
+			for(Object e:graph.edges()){
+				Edge ee = (Edge) e;
+				ee.draw(g2d);
 			}
 		}
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
+			int X = e.getX()-13;
+			int Y = e.getY()-13;
+			
+			if(!conflict(e))
+				graph.insertVertex("", X, Y);
+			
+			this.repaint();
+		}
+		
+		public boolean conflict(MouseEvent e){
 			int X = e.getX()-13;
 			int Y = e.getY()-13;
 			
@@ -126,25 +144,45 @@ public class Display {
 				int vvX = vv.getCoords().x;
 				int[] collisions = {0,0,0,0};
 				
-				if(X+13 > vvX-13)
+				if(vv.contains(e.getPoint())){
+					if(selected == null){
+						vv.setColor(Color.RED);
+						selected = vv;
+					}else{
+						if(vv == selected){
+							selected.setColor(Color.BLACK);
+							selected = null;
+						}else if(e.isControlDown()){
+							graph.insertEdge(selected, vv, "");
+							
+						}else{
+							selected.setColor(Color.BLACK);
+							vv.setColor(Color.RED);
+							selected = vv;
+						}
+					}
+					return true;
+				}
+				
+				if(X+12 > vvX-12)
 					collisions[0]=1;
-				if(Y+13 > vvY-13)
+				if(Y+12 > vvY-12)
 					collisions[1]=1;
-				if(X-13 < vvX+13)
+				if(X-12 < vvX+12)
 					collisions[2]=1;
-				if(Y-13 < vvY+13)
+				if(Y-12 < vvY+12)
 					collisions[3]=1;
 				
 				for(int i=0;i<3;i++)
 					collisions[3]+=collisions[i];
 				
-				if(collisions[3]>3)
-					return;
+				if(collisions[3]>3){
+					return true;
+				}
 			
 			}
 			
-			graph.insertVertex("", X, Y);
-			this.repaint();
+			return false;
 		}
 
 		@Override

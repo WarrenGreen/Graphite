@@ -1,23 +1,26 @@
 package structures;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
 
 public class Vertex<E> {
 	
 	private E 					element;
-	private Point				coords;
+	private Point				coords = new Point(10,10);;
 	private Position<Vertex<E>> vertexLoc;
 	private Map<Object, Object> attributes;
-	private ArrayList<Edge> 		incidentEdges;
+	private ArrayList<Edge> 	incidentEdges;
+	private Color 				fillColor = Color.BLACK;
+	Ellipse2D oval;
 	
 	public Vertex(E element){
 		this.attributes =  new HashMap<Object, Object>(5);
 		this.element = element;
-		this.vertexLoc = vertexLoc;
-		this.coords = new Point(10,10);
 		this.incidentEdges = new ArrayList<Edge>();
 		for(int i=0; i<incidentEdges.size(); i++)
 			this.incidentEdges.add(incidentEdges.get(i));
@@ -26,7 +29,6 @@ public class Vertex<E> {
 	public Vertex(E element, int xCoord, int yCoord){
 		this.attributes =  new HashMap<Object, Object>(5);
 		this.element = element;
-		this.vertexLoc = vertexLoc;
 		this.coords = new Point(xCoord, yCoord);
 		this.incidentEdges = new ArrayList<Edge>();
 		for(int i=0; i<incidentEdges.size(); i++)
@@ -120,10 +122,24 @@ public class Vertex<E> {
 		this.coords = new Point(xCoord, yCoord);
 	}
 	
+	public Color getColor(){
+		return this.fillColor;
+	}
+	
+	public void setColor(Color col){
+		this.fillColor = col;
+	}
+	
+	public boolean contains(Point p){
+		return oval.contains(p);
+	}
+	
 	public void draw(Graphics g){
-		g.setColor(Color.BLACK);
-		g.fillOval(coords.x, coords.y, 25, 25);
-		g.drawOval(coords.x, coords.y, 25,25);
+		Graphics2D g2d = (Graphics2D) g;
+		oval = new Ellipse2D.Double(coords.getX(), coords.getY(), 25, 25);
+		g2d.setColor(fillColor);
+		g2d.fill(oval);
+		
 	}
 
 }

@@ -1,5 +1,10 @@
 package structures;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.geom.Line2D;
+
 public class Edge<E>  {
 	private E 					element;
 	private Vertex[] 			endpoints;
@@ -71,6 +76,13 @@ public class Edge<E>  {
 	
 	public Iterable<Object> values() {
 		return this.attributes.values();
+	}
+	
+	public void draw(Graphics g){
+		Graphics2D g2d = (Graphics2D) g;
+		g2d.setColor(Color.BLACK);
+		g2d.drawLine((int)endpoints[0].getCoords().getX()+13, (int)endpoints[0].getCoords().getY()+13, (int)endpoints[1].getCoords().getX()+13, (int)endpoints[1].getCoords().getY()+13);
+		
 	}
 
 }
