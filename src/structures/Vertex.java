@@ -48,12 +48,7 @@ public class Vertex<E> {
 	}
 	
 	public Edge removeIterableEdge(Edge e){
-		for(int x=0;x<incidentEdges.size();x++) {
-			if(((Edge)incidentEdges.get(x).element()) == e) {
-				incidentEdges.remove(x);
-				return e;
-			}
-		}
+		incidentEdges.remove(e);
 		
 		return null;
 	}

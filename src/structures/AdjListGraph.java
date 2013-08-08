@@ -198,10 +198,9 @@ public class AdjListGraph<V, E> {
 	 * @Override
 	 */
 	public V removeVertex(Vertex<V> v) {
-		for(Vertex<V> curr: vertices)
-			if(curr.element()==v) vertices.remove(curr);
 		for(Edge curr: (Iterable<Edge<E>>) checkVertex(v).getIncidentEdges())
-			removeEdge(curr);
+			removeEdge(curr, v);
+		vertices.remove(v);
 		return v.element();
 	}
 	
@@ -213,10 +212,22 @@ public class AdjListGraph<V, E> {
 	 * @Override
 	 */
 	public E removeEdge(Edge<E> e) {
-		for(Edge curr: edges)
-			if(curr.element()==e) vertices.remove(curr);
+		edges.remove(e);
 		checkVertex(checkEdge(e).endpoints()[0]).removeIterableEdge(e);
 		checkVertex(checkEdge(e).endpoints()[1]).removeIterableEdge(e);
+		return e.element();
+	}
+	
+	/**
+	 * Removes supplied edge
+	 * 
+	 * @param e - edge to remove
+	 * @return element of removed edge
+	 * @Override
+	 */
+	public E removeEdge(Edge<E> e, Vertex<V> v) {
+		edges.remove(e);
+		opposite(v, e).removeIterableEdge(e);
 		return e.element();
 	}
 

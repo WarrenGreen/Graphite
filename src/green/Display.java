@@ -23,12 +23,15 @@ import javax.swing.event.MenuListener;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.geom.Ellipse2D;
+import org.eclipse.wb.swing.FocusTraversalOnArray;
 
 
 public class Display {
@@ -95,7 +98,11 @@ public class Display {
 		
 		JButton btnColorGraph = new JButton("Color Graph");
 		btnColorGraph.addActionListener(new ActionListener() {
+
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				
 			}
 		});
 		GridBagConstraints gbc_btnColorGraph = new GridBagConstraints();
@@ -104,6 +111,7 @@ public class Display {
 		gbc_btnColorGraph.gridy = 0;
 		gbc_btnColorGraph.insets = new Insets(5,0,0,5);
 		mainPanel.add(btnColorGraph, gbc_btnColorGraph);
+		frame.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{drawpad}));
 	}
 	
 	class canvas extends JPanel implements MouseListener{
@@ -128,13 +136,22 @@ public class Display {
 			int X = e.getX()-13;
 			int Y = e.getY()-13;
 			
-			if(!conflict(e))
+			Vertex vv = conflict(e);
+			if(vv==null)
 				graph.insertVertex("", X, Y);
+			else if(vv.contains(e.getPoint()))
+				if(e.getButton()==MouseEvent.BUTTON3){
+					if(vv == selected)
+						selected = null;
+					graph.removeVertex(vv);
+					this.getGraphics().clearRect((int)vv.getCoords().getX(), (int)vv.getCoords().getY(), 25,25);
+				}else
+					vertexClicked(vv, e.isControlDown());
 			
 			this.repaint();
 		}
 		
-		public boolean conflict(MouseEvent e){
+		public Vertex conflict(MouseEvent e){
 			int X = e.getX()-13;
 			int Y = e.getY()-13;
 			
@@ -145,23 +162,7 @@ public class Display {
 				int[] collisions = {0,0,0,0};
 				
 				if(vv.contains(e.getPoint())){
-					if(selected == null){
-						vv.setColor(Color.RED);
-						selected = vv;
-					}else{
-						if(vv == selected){
-							selected.setColor(Color.BLACK);
-							selected = null;
-						}else if(e.isControlDown()){
-							graph.insertEdge(selected, vv, "");
-							
-						}else{
-							selected.setColor(Color.BLACK);
-							vv.setColor(Color.RED);
-							selected = vv;
-						}
-					}
-					return true;
+					return vv;
 				}
 				
 				if(X+12 > vvX-12)
@@ -177,12 +178,31 @@ public class Display {
 					collisions[3]+=collisions[i];
 				
 				if(collisions[3]>3){
-					return true;
+					return vv;
 				}
 			
 			}
 			
-			return false;
+			return null;
+		}
+		
+		public void vertexClicked(Vertex vv, boolean controlDown){
+			if(selected == null){
+				vv.setColor(Color.RED);
+				selected = vv;
+			}else{
+				if(vv == selected){
+					selected.setColor(Color.BLACK);
+					selected = null;
+				}else if(controlDown){
+					graph.insertEdge(selected, vv, "");
+					
+				}else{
+					selected.setColor(Color.BLACK);
+					vv.setColor(Color.RED);
+					selected = vv;
+				}
+			}
 		}
 
 		@Override
