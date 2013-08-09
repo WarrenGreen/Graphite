@@ -31,6 +31,7 @@ public class Display {
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 	private AdjListGraph<Integer, Integer> graph;
 	private Vertex<Integer>	selected = null;
+	JPanel drawpad;
 
 	/**
 	 * Launch the application.
@@ -77,7 +78,7 @@ public class Display {
 		gbl_mainPanel.rowWeights = new double[]{1.0, Double.MIN_VALUE};
 		mainPanel.setLayout(gbl_mainPanel);
 		
-		JPanel drawpad = new canvas();
+		drawpad = new canvas();
 		drawpad.setDoubleBuffered(true);
 		drawpad.setBackground(Color.LIGHT_GRAY);
 		GridBagConstraints gbc_drawpad = new GridBagConstraints();
@@ -94,6 +95,7 @@ public class Display {
 			public void actionPerformed(ActionEvent e) {
 				Functions func = new Functions();
 				graph = func.colorGraph(graph);
+				drawpad.repaint();
 				
 			}
 		});
