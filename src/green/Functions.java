@@ -1,5 +1,6 @@
 package green;
 
+import java.awt.Color;
 import java.util.ArrayList;
 
 import structures.*;
@@ -26,6 +27,49 @@ public class Functions {
 			
 			v.setElement(available.get(0));
 		
+		}
+		
+		return graph;
+	}
+	
+	public AdjListGraph<Integer, Integer> findPath(AdjListGraph<Integer, Integer> graph, Vertex<Integer> start, Vertex<Integer> end){
+		ArrayList<Vertex<Integer>> queue = new ArrayList<Vertex<Integer>>();
+		queue.add(start);
+		start.put("distance", 0);
+		while(!queue.isEmpty()){
+			Vertex current = queue.get(0);
+			if(current == end) return buildPath(graph, start, end);
+			queue.remove(0);
+			for(Edge e:(Iterable<Edge<Integer>>)current.getIncidentEdges()){
+				if(e.get("discovered")==null){
+					Vertex<Integer> v = graph.opposite(current, e);
+					if(v.get("distance")==null) v.put("distance", ((int)current.get("distance"))+1);
+					else if(((int)v.get("distance"))>((int)current.get("distance"))+1) v.put("distance", ((int)current.get("distance"))+1);
+					e.put("discovered", true);
+					queue.add(v);
+				}
+			}
+		}
+		
+		return graph;
+	}
+	
+	public AdjListGraph<Integer, Integer> buildPath(AdjListGraph<Integer,Integer> graph, Vertex<Integer> start, Vertex<Integer> end){
+		Vertex<Integer> current = end;
+		while(current != start){
+			int min =Integer.MAX_VALUE;
+			Vertex<Integer> minVert = null;
+			Edge<Integer> minEdge = null;
+			for(Edge e:(Iterable<Edge>)current.getIncidentEdges()){
+				Vertex<Integer> adj = graph.opposite(current, e);
+				if(adj.get("distance")!=null&&((int)adj.get("distance"))<min){
+					minVert = adj;
+					minEdge = e;
+					min = (int)adj.get("distance");
+				}
+			}
+			minEdge.put("color", Color.YELLOW);
+			current = minVert;
 		}
 		
 		return graph;

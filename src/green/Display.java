@@ -7,6 +7,7 @@ import javax.swing.JFrame;
 import java.awt.GridBagLayout;
 import javax.swing.JPanel;
 
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
@@ -22,16 +23,19 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import java.awt.Component;
+import java.util.ArrayList;
+
 import org.eclipse.wb.swing.FocusTraversalOnArray;
 
 
 public class Display {
 
 	private JFrame frame;
-	private final ButtonGroup buttonGroup = new ButtonGroup();
+	private final ButtonGroup bgpFunctions = new ButtonGroup();
 	private AdjListGraph<Integer, Integer> graph;
 	private Vertex<Integer>	selected = null;
-	JPanel drawpad;
+	private Vertex<Integer> altSelected = null;
+	private JPanel drawpad;
 
 	/**
 	 * Launch the application.
@@ -63,19 +67,16 @@ public class Display {
 	private void initialize() {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 800, 640);
+		frame.setTitle("Graphite");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-		JPanel panel = new canvas();
-		frame.getContentPane().add(panel);
-		frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.X_AXIS));
 		
 		JPanel mainPanel = new JPanel();
 		frame.getContentPane().add(mainPanel);
 		GridBagLayout gbl_mainPanel = new GridBagLayout();
 		gbl_mainPanel.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-		gbl_mainPanel.rowHeights = new int[]{0, 0};
+		gbl_mainPanel.rowHeights = new int[]{0, 0, 0};
 		gbl_mainPanel.columnWeights = new double[]{1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_mainPanel.rowWeights = new double[]{1.0, Double.MIN_VALUE};
+		gbl_mainPanel.rowWeights = new double[]{1.0, 1.0, Double.MIN_VALUE};
 		mainPanel.setLayout(gbl_mainPanel);
 		
 		drawpad = new canvas();
@@ -83,13 +84,35 @@ public class Display {
 		drawpad.setBackground(Color.LIGHT_GRAY);
 		GridBagConstraints gbc_drawpad = new GridBagConstraints();
 		gbc_drawpad.gridwidth = 22;
-		gbc_drawpad.insets = new Insets(5, 0, 5, 5);
+		gbc_drawpad.gridheight = 2;
+		gbc_drawpad.insets = new Insets(5, 5, 5, 5);
 		gbc_drawpad.fill = GridBagConstraints.BOTH;
 		gbc_drawpad.gridx = 0;
 		gbc_drawpad.gridy = 0;
 		mainPanel.add(drawpad, gbc_drawpad);
 		
+		JPanel sidePanel = new JPanel();
+		GridBagConstraints gbc_sidePanel = new GridBagConstraints();
+		gbc_sidePanel.insets = new Insets(5, 0, 0, 5);
+		gbc_sidePanel.fill = GridBagConstraints.BOTH;
+		gbc_sidePanel.gridx = 22;
+		gbc_sidePanel.gridy = 0;
+		mainPanel.add(sidePanel, gbc_sidePanel);
+		GridBagLayout gbl_sidePanel = new GridBagLayout();
+		gbl_sidePanel.columnWidths = new int[]{118};
+		gbl_sidePanel.rowHeights = new int[]{25, 0, 0, 0};
+		gbl_sidePanel.columnWeights = new double[]{0.0};
+		gbl_sidePanel.rowWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
+		sidePanel.setLayout(gbl_sidePanel);
+		
 		JButton btnColorGraph = new JButton("Color Graph");
+		GridBagConstraints gbc_btnColorGraph = new GridBagConstraints();
+		gbc_btnColorGraph.anchor = GridBagConstraints.NORTHWEST;
+		gbc_btnColorGraph.insets = new Insets(0, 0, 5, 0);
+		gbc_btnColorGraph.gridx = 0;
+		gbc_btnColorGraph.gridy = 0;
+		sidePanel.add(btnColorGraph, gbc_btnColorGraph);
+		bgpFunctions.add(btnColorGraph);
 		btnColorGraph.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -99,12 +122,36 @@ public class Display {
 				
 			}
 		});
-		GridBagConstraints gbc_btnColorGraph = new GridBagConstraints();
-		gbc_btnColorGraph.anchor = GridBagConstraints.NORTHEAST;
-		gbc_btnColorGraph.gridx = 22;
-		gbc_btnColorGraph.gridy = 0;
-		gbc_btnColorGraph.insets = new Insets(5,0,0,5);
-		mainPanel.add(btnColorGraph, gbc_btnColorGraph);
+		
+		JButton btnClear = new JButton("      Clear      ");
+		GridBagConstraints gbc_btnClear = new GridBagConstraints();
+		gbc_btnClear.insets = new Insets(5, 0, 5, 0);
+		gbc_btnClear.anchor = GridBagConstraints.NORTHWEST;
+		gbc_btnClear.gridx = 0;
+		gbc_btnClear.gridy = 2;
+		sidePanel.add(btnClear, gbc_btnClear);
+		btnClear.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				graph = new AdjListGraph<Integer, Integer>();
+				drawpad.repaint();
+			}
+		});
+		
+		JButton btnFindPath = new JButton("  Find Path  ");
+		GridBagConstraints gbc_btnFindPath = new GridBagConstraints();
+		gbc_btnFindPath.gridx = 0;
+		gbc_btnFindPath.gridy = 1;
+		sidePanel.add(btnFindPath, gbc_btnFindPath);
+		btnFindPath.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Functions func = new Functions();
+				graph = func.findPath(graph, selected, altSelected);
+				drawpad.repaint();
+			}
+		});
+		
 		frame.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{drawpad}));
 	}
 	
@@ -133,18 +180,19 @@ public class Display {
 			int Y = e.getY()-13;
 			
 			Vertex<Integer> vv = conflict(e);
-			if(vv==null){
-				if(e.getButton()==MouseEvent.BUTTON1)
+			if(e.getButton() == MouseEvent.BUTTON1){
+				if(vv == null){
 					graph.insertVertex(-1, X, Y);
-			}else if(vv.contains(e.getPoint()))
-				if(e.getButton()==MouseEvent.BUTTON3){
-					if(vv == selected)
-						selected = null;
-					graph.removeVertex(vv);
-					this.getGraphics().clearRect((int)vv.getCoords().getX(), (int)vv.getCoords().getY(), 25,25);
-				}else
-					vertexClicked(vv, e.isControlDown());
-			
+				}else{
+					vertexClicked(vv, e);
+				}
+			}else if(e.getButton() == MouseEvent.BUTTON3){
+				if(vv == selected)
+					selected = null;
+				graph.removeVertex(vv);
+				this.getGraphics().clearRect((int)vv.getCoords().getX(), (int)vv.getCoords().getY(), 25,25);
+			}
+		
 			this.repaint();
 		}
 		
@@ -183,22 +231,23 @@ public class Display {
 			return null;
 		}
 		
-		public void vertexClicked(Vertex<Integer> vv, boolean controlDown){
-			if(selected == null){
-				vv.setColor(Color.RED);
-				selected = vv;
-			}else{
+		public void vertexClicked(Vertex<Integer> vv, MouseEvent e){
+			if(e.isShiftDown()){
+				if(altSelected != null) altSelected.put("color", Color.BLACK);
+				vv.put("color", Color.RED);
+				altSelected = vv;
 				if(vv == selected){
-					selected.setColor(Color.BLACK);
 					selected = null;
-				}else if(controlDown){
-					graph.insertEdge(selected, vv, 0);
-					
-				}else{
-					selected.setColor(Color.BLACK);
-					vv.setColor(Color.RED);
-					selected = vv;
 				}
+			}else if(vv == selected){
+				selected.put("color", Color.BLACK);
+				selected = null;
+			}else if(e.isControlDown()){
+				if(selected != null) graph.insertEdge(selected, vv, 0);
+			}else{
+				if(selected != null) selected.put("color",Color.BLACK);
+				vv.put("color", Color.GREEN);
+				selected = vv;
 			}
 		}
 

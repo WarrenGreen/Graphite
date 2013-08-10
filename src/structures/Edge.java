@@ -18,6 +18,7 @@ public class Edge<E>  {
 		this.endpoints[1] 	= v;
 		attributes			= new HashMap<Object, Object>(5);
 		attributes.put("visited", "false");
+		attributes.put("color", Color.BLACK);
 		
 	}
 	
@@ -80,7 +81,7 @@ public class Edge<E>  {
 	
 	public void draw(Graphics g){
 		Graphics2D g2d = (Graphics2D) g;
-		g2d.setColor(Color.BLACK);
+		g2d.setColor((Color)attributes.get("color"));
 		g2d.drawLine((int)endpoints[0].getCoords().getX()+13, (int)endpoints[0].getCoords().getY()+13, (int)endpoints[1].getCoords().getX()+13, (int)endpoints[1].getCoords().getY()+13);
 		
 	}
