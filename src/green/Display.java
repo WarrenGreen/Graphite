@@ -11,6 +11,8 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
+import java.awt.TextField;
+
 import javax.swing.JButton;
 import java.awt.Insets;
 import javax.swing.BoxLayout;
@@ -26,6 +28,8 @@ import java.awt.Component;
 import java.util.ArrayList;
 
 import org.eclipse.wb.swing.FocusTraversalOnArray;
+import javax.swing.JList;
+import javax.swing.JTextArea;
 
 
 public class Display {
@@ -36,6 +40,7 @@ public class Display {
 	private Vertex<Integer>	selected = null;
 	private Vertex<Integer> altSelected = null;
 	private JPanel drawpad;
+	private JTextArea consoleOut;
 
 	/**
 	 * Launch the application.
@@ -73,10 +78,10 @@ public class Display {
 		JPanel mainPanel = new JPanel();
 		frame.getContentPane().add(mainPanel);
 		GridBagLayout gbl_mainPanel = new GridBagLayout();
-		gbl_mainPanel.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-		gbl_mainPanel.rowHeights = new int[]{0, 0, 0};
-		gbl_mainPanel.columnWeights = new double[]{1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_mainPanel.rowWeights = new double[]{1.0, 1.0, Double.MIN_VALUE};
+		gbl_mainPanel.columnWidths = new int[]{0,0};
+		gbl_mainPanel.rowHeights = new int[]{0, 0};
+		gbl_mainPanel.columnWeights = new double[]{1.0, Double.MIN_VALUE};
+		gbl_mainPanel.rowWeights = new double[]{1.0, Double.MIN_VALUE};
 		mainPanel.setLayout(gbl_mainPanel);
 		
 		drawpad = new canvas();
@@ -93,19 +98,21 @@ public class Display {
 		
 		JPanel sidePanel = new JPanel();
 		GridBagConstraints gbc_sidePanel = new GridBagConstraints();
-		gbc_sidePanel.insets = new Insets(5, 0, 0, 5);
+		gbc_sidePanel.gridheight = 2;
+		gbc_sidePanel.insets = new Insets(5, 5, 5, 5);
 		gbc_sidePanel.fill = GridBagConstraints.BOTH;
 		gbc_sidePanel.gridx = 22;
 		gbc_sidePanel.gridy = 0;
 		mainPanel.add(sidePanel, gbc_sidePanel);
 		GridBagLayout gbl_sidePanel = new GridBagLayout();
 		gbl_sidePanel.columnWidths = new int[]{118};
-		gbl_sidePanel.rowHeights = new int[]{25, 0, 0, 0};
-		gbl_sidePanel.columnWeights = new double[]{0.0};
-		gbl_sidePanel.rowWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_sidePanel.rowHeights = new int[]{25, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		gbl_sidePanel.columnWeights = new double[]{1.0};
+		gbl_sidePanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
 		sidePanel.setLayout(gbl_sidePanel);
 		
 		JButton btnColorGraph = new JButton("Color Graph");
+		btnColorGraph.setPreferredSize(new Dimension(120,25));
 		GridBagConstraints gbc_btnColorGraph = new GridBagConstraints();
 		gbc_btnColorGraph.anchor = GridBagConstraints.NORTHWEST;
 		gbc_btnColorGraph.insets = new Insets(0, 0, 5, 0);
@@ -118,12 +125,14 @@ public class Display {
 			public void actionPerformed(ActionEvent e) {
 				Functions func = new Functions();
 				graph = func.colorGraph(graph);
+				consoleOut.setText("Colors: "+graph.attributes.get("colors")+"\nBipartite: " + graph.attributes.get("bipartite"));
 				drawpad.repaint();
 				
 			}
 		});
 		
-		JButton btnClear = new JButton("      Clear      ");
+		JButton btnClear = new JButton("Clear");
+		btnClear.setPreferredSize(new Dimension(120,25));
 		GridBagConstraints gbc_btnClear = new GridBagConstraints();
 		gbc_btnClear.insets = new Insets(5, 0, 5, 0);
 		gbc_btnClear.anchor = GridBagConstraints.NORTHWEST;
@@ -134,12 +143,15 @@ public class Display {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				graph = new AdjListGraph<Integer, Integer>();
+				consoleOut.setText("");
 				drawpad.repaint();
 			}
 		});
 		
-		JButton btnFindPath = new JButton("  Find Path  ");
+		JButton btnFindPath = new JButton("Find Path");
+		btnFindPath.setPreferredSize(new Dimension(120,25));
 		GridBagConstraints gbc_btnFindPath = new GridBagConstraints();
+		gbc_btnFindPath.insets = new Insets(0, 0, 5, 0);
 		gbc_btnFindPath.gridx = 0;
 		gbc_btnFindPath.gridy = 1;
 		sidePanel.add(btnFindPath, gbc_btnFindPath);
@@ -151,6 +163,16 @@ public class Display {
 				drawpad.repaint();
 			}
 		});
+		
+		consoleOut = new JTextArea();
+		consoleOut.setEditable(false);
+		GridBagConstraints gbc_consoleOut = new GridBagConstraints();
+		gbc_consoleOut.fill = GridBagConstraints.BOTH;
+		gbc_consoleOut.gridx = 0;
+		gbc_consoleOut.gridy = 8;
+		sidePanel.add(consoleOut, gbc_consoleOut);
+		consoleOut.setPreferredSize(new Dimension(10,10));
+		
 		
 		frame.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{drawpad}));
 	}
@@ -183,14 +205,18 @@ public class Display {
 			if(e.getButton() == MouseEvent.BUTTON1){
 				if(vv == null){
 					graph.insertVertex(-1, X, Y);
+					consoleOut.setText("");
 				}else{
 					vertexClicked(vv, e);
 				}
 			}else if(e.getButton() == MouseEvent.BUTTON3){
-				if(vv == selected)
-					selected = null;
-				graph.removeVertex(vv);
-				this.getGraphics().clearRect((int)vv.getCoords().getX(), (int)vv.getCoords().getY(), 25,25);
+				if(vv!=null){
+					if(vv == selected)
+						selected = null;
+					graph.removeVertex(vv);
+					consoleOut.setText("");
+					this.getGraphics().clearRect((int)vv.getCoords().getX(), (int)vv.getCoords().getY(), 25,25);
+				}
 			}
 		
 			this.repaint();
@@ -243,7 +269,10 @@ public class Display {
 				selected.put("color", Color.BLACK);
 				selected = null;
 			}else if(e.isControlDown()){
-				if(selected != null) graph.insertEdge(selected, vv, 0);
+				if(selected != null) {
+					graph.insertEdge(selected, vv, 0);
+					consoleOut.setText("");
+				}
 			}else{
 				if(selected != null) selected.put("color",Color.BLACK);
 				vv.put("color", Color.GREEN);

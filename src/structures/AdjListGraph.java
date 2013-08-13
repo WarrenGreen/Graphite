@@ -15,6 +15,7 @@ public class AdjListGraph<V, E> {
 	
 	protected ArrayList<Vertex<V>> 	vertices;
 	protected ArrayList<Edge<E>> 		edges;
+	public HashMap attributes;
 	
 	/**
 	 * constructor
@@ -22,6 +23,7 @@ public class AdjListGraph<V, E> {
 	public AdjListGraph() {
 		vertices = new ArrayList<Vertex<V>>();
 		edges 	 = new ArrayList<Edge<E>>();
+		attributes = new HashMap(15);
 	}
 	
 	/**

@@ -29,10 +29,19 @@ public class Functions {
 		
 		}
 		
+		graph.attributes.put("colors", colors.size());
+		graph.attributes.put("bipartite", colors.size()==2?true:false);
+		
 		return graph;
 	}
 	
 	public AdjListGraph<Integer, Integer> findPath(AdjListGraph<Integer, Integer> graph, Vertex<Integer> start, Vertex<Integer> end){
+		for(Edge e:graph.edges()){
+			e.put("discovered", null);
+			e.put("color", Color.BLACK);
+		}
+		for(Vertex v:graph.vertices())
+			v.put("distance", null);
 		ArrayList<Vertex<Integer>> queue = new ArrayList<Vertex<Integer>>();
 		queue.add(start);
 		start.put("distance", 0);
