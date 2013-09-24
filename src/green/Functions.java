@@ -15,7 +15,7 @@ public class Functions {
 			available = new ArrayList<Integer>();
 			available.addAll(colors);
 			for(Edge e:(Iterable<Edge<Integer>>)v.getIncidentEdges()){
-				int element = (int)graph.opposite(v, e).element();
+				int element = (Integer)graph.opposite(v, e).element();
 				if(available.contains(element))
 					available.remove(available.indexOf(element));
 			}
@@ -52,8 +52,8 @@ public class Functions {
 			for(Edge e:(Iterable<Edge<Integer>>)current.getIncidentEdges()){
 				if(e.get("discovered")==null){
 					Vertex<Integer> v = graph.opposite(current, e);
-					if(v.get("distance")==null) v.put("distance", ((int)current.get("distance"))+1);
-					else if(((int)v.get("distance"))>((int)current.get("distance"))+1) v.put("distance", ((int)current.get("distance"))+1);
+					if(v.get("distance")==null) v.put("distance", ((Integer)current.get("distance"))+1);
+					else if(((Integer)v.get("distance"))>((Integer)current.get("distance"))+1) v.put("distance", ((Integer)current.get("distance"))+1);
 					e.put("discovered", true);
 					queue.add(v);
 				}
@@ -71,10 +71,10 @@ public class Functions {
 			Edge<Integer> minEdge = null;
 			for(Edge e:(Iterable<Edge>)current.getIncidentEdges()){
 				Vertex<Integer> adj = graph.opposite(current, e);
-				if(adj.get("distance")!=null&&((int)adj.get("distance"))<min){
+				if(adj.get("distance")!=null&&((Integer)adj.get("distance"))<min){
 					minVert = adj;
 					minEdge = e;
-					min = (int)adj.get("distance");
+					min = (Integer)adj.get("distance");
 				}
 			}
 			minEdge.put("color", Color.YELLOW);
