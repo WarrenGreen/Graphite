@@ -148,6 +148,22 @@ public class Display {
 			}
 		});
 		
+		JButton btnHelp = new JButton("Help");
+		btnHelp.setPreferredSize(new Dimension(120,25));
+		GridBagConstraints gbc_btnHelp = new GridBagConstraints();
+		gbc_btnHelp.insets = new Insets(0, 0, 5, 0);
+		gbc_btnHelp.anchor = GridBagConstraints.NORTHWEST;
+		gbc_btnHelp.gridx = 0;
+		gbc_btnHelp.gridy = 3;
+		sidePanel.add(btnHelp, gbc_btnHelp);
+		btnHelp.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Help help = new Help();
+				
+			}
+		});
+		
 		JButton btnFindPath = new JButton("Find Path");
 		btnFindPath.setPreferredSize(new Dimension(120,25));
 		GridBagConstraints gbc_btnFindPath = new GridBagConstraints();
